@@ -1,0 +1,96 @@
+import Foundation
+import UserNotifications
+import WatchKit
+
+class NotificationManager {
+    func requestPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+    }
+
+    func scheduleGoalNotification(at date: Date, protocolName: String) {
+        requestPermission()
+
+        let content = UNMutableNotificationContent()
+        content.title = "Fast Complete!"
+        content.body = "You did it! \(protocolName) fast complete!"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: max(1, date.timeIntervalSinceNow),
+            repeats: false
+        )
+
+        let request = UNNotificationRequest(
+            identifier: "goal-reached",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    func scheduleMilestoneNotifications(startTime: Date, duration: TimeInterval) {
+        let milestones: [(Double, String)] = [
+            (0.25, "Quarter of the way!"),
+            (0.50, "Halfway there!"),
+            (0.75, "Almost there!"),
+        ]
+
+        for (fraction, message) in milestones {
+            let triggerDate = startTime.addingTimeInterval(duration * fraction)
+            let interval = triggerDate.timeIntervalSinceNow
+            guard interval > 0 else { continue }
+
+            let hours = Int(duration * fraction) / 3600
+
+            let content = UNMutableNotificationContent()
+            content.title = message
+            content.body = "\(hours)h done."
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(
+                timeInterval: interval,
+                repeats: false
+            )
+
+            let request = UNNotificationRequest(
+                identifier: "milestone-\(Int(fraction * 100))",
+                content: content,
+                trigger: trigger
+            )
+
+            UNUserNotificationCenter.current().add(request)
+        }
+    }
+
+    func scheduleEatingWindowReminder(at date: Date, minutesLeft: Int) {
+        let interval = date.timeIntervalSinceNow
+        guard interval > 0 else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Eating Window Closing"
+        content.body = "Eating window closes in \(minutesLeft) min."
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: interval,
+            repeats: false
+        )
+
+        let request = UNNotificationRequest(
+            identifier: "eating-window-ending",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    func cancelPendingNotifications() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+
+    func playSuccessHaptic() {
+        WKInterfaceDevice.current().play(.success)
+    }
+}
