@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		D483A0B62F89403E00D7BC10 /* FastWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = D483A0B52F89403E00D7BC10 /* FastWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D483A1512F8956EF00D7BC10 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D483A1502F8956EF00D7BC10 /* WidgetKit.framework */; };
+		D483A1532F8956EF00D7BC10 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D483A1522F8956EF00D7BC10 /* SwiftUI.framework */; };
+		D483A1602F8956F000D7BC10 /* FastWatchWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D483A14E2F8956EF00D7BC10 /* FastWatchWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -17,6 +20,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = D483A0B42F89403E00D7BC10;
 			remoteInfo = "FastWatch Watch App";
+		};
+		D483A15E2F8956F000D7BC10 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D483A0A92F89403E00D7BC10 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D483A14D2F8956EF00D7BC10;
+			remoteInfo = FastWatchWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -32,17 +42,49 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D483A1652F8956F000D7BC10 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D483A1602F8956F000D7BC10 /* FastWatchWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D483A0AF2F89403E00D7BC10 /* FastWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D483A0B52F89403E00D7BC10 /* FastWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FastWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D483A14E2F8956EF00D7BC10 /* FastWatchWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FastWatchWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D483A1502F8956EF00D7BC10 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		D483A1522F8956EF00D7BC10 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D483A1612F8956F000D7BC10 /* Exceptions for "FastWatchWidget" folder in "FastWatchWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D483A14D2F8956EF00D7BC10 /* FastWatchWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D483A0B92F89403E00D7BC10 /* FastWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "FastWatch Watch App";
+			sourceTree = "<group>";
+		};
+		D483A1542F8956EF00D7BC10 /* FastWatchWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D483A1612F8956F000D7BC10 /* Exceptions for "FastWatchWidget" folder in "FastWatchWidgetExtension" target */,
+			);
+			path = FastWatchWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -55,6 +97,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D483A14B2F8956EF00D7BC10 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D483A1532F8956EF00D7BC10 /* SwiftUI.framework in Frameworks */,
+				D483A1512F8956EF00D7BC10 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -62,6 +113,8 @@
 			isa = PBXGroup;
 			children = (
 				D483A0B92F89403E00D7BC10 /* FastWatch Watch App */,
+				D483A1542F8956EF00D7BC10 /* FastWatchWidget */,
+				D483A14F2F8956EF00D7BC10 /* Frameworks */,
 				D483A0B02F89403E00D7BC10 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,8 +124,18 @@
 			children = (
 				D483A0AF2F89403E00D7BC10 /* FastWatch.app */,
 				D483A0B52F89403E00D7BC10 /* FastWatch Watch App.app */,
+				D483A14E2F8956EF00D7BC10 /* FastWatchWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D483A14F2F8956EF00D7BC10 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D483A1502F8956EF00D7BC10 /* WidgetKit.framework */,
+				D483A1522F8956EF00D7BC10 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -104,10 +167,12 @@
 				D483A0B12F89403E00D7BC10 /* Sources */,
 				D483A0B22F89403E00D7BC10 /* Frameworks */,
 				D483A0B32F89403E00D7BC10 /* Resources */,
+				D483A1652F8956F000D7BC10 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D483A15F2F8956F000D7BC10 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D483A0B92F89403E00D7BC10 /* FastWatch Watch App */,
@@ -118,6 +183,28 @@
 			productName = "FastWatch Watch App";
 			productReference = D483A0B52F89403E00D7BC10 /* FastWatch Watch App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D483A14D2F8956EF00D7BC10 /* FastWatchWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D483A1622F8956F000D7BC10 /* Build configuration list for PBXNativeTarget "FastWatchWidgetExtension" */;
+			buildPhases = (
+				D483A14A2F8956EF00D7BC10 /* Sources */,
+				D483A14B2F8956EF00D7BC10 /* Frameworks */,
+				D483A14C2F8956EF00D7BC10 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D483A1542F8956EF00D7BC10 /* FastWatchWidget */,
+			);
+			name = FastWatchWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = FastWatchWidgetExtension;
+			productReference = D483A14E2F8956EF00D7BC10 /* FastWatchWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -133,6 +220,9 @@
 						CreatedOnToolsVersion = 26.4;
 					};
 					D483A0B42F89403E00D7BC10 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					D483A14D2F8956EF00D7BC10 = {
 						CreatedOnToolsVersion = 26.4;
 					};
 				};
@@ -153,6 +243,7 @@
 			targets = (
 				D483A0AE2F89403E00D7BC10 /* FastWatch */,
 				D483A0B42F89403E00D7BC10 /* FastWatch Watch App */,
+				D483A14D2F8956EF00D7BC10 /* FastWatchWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -172,10 +263,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D483A14C2F8956EF00D7BC10 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D483A0B12F89403E00D7BC10 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D483A14A2F8956EF00D7BC10 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -189,6 +294,11 @@
 			isa = PBXTargetDependency;
 			target = D483A0B42F89403E00D7BC10 /* FastWatch Watch App */;
 			targetProxy = D483A0B72F89403E00D7BC10 /* PBXContainerItemProxy */;
+		};
+		D483A15F2F8956F000D7BC10 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D483A14D2F8956EF00D7BC10 /* FastWatchWidgetExtension */;
+			targetProxy = D483A15E2F8956F000D7BC10 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -411,6 +521,73 @@
 			};
 			name = Release;
 		};
+		D483A1632F8956F000D7BC10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7UWQ7HF465;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FastWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FastWatchWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp.FastWatchWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Debug;
+		};
+		D483A1642F8956F000D7BC10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7UWQ7HF465;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FastWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FastWatchWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp.FastWatchWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -437,6 +614,15 @@
 			buildConfigurations = (
 				D483A0C72F89403F00D7BC10 /* Debug */,
 				D483A0C82F89403F00D7BC10 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D483A1622F8956F000D7BC10 /* Build configuration list for PBXNativeTarget "FastWatchWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D483A1632F8956F000D7BC10 /* Debug */,
+				D483A1642F8956F000D7BC10 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

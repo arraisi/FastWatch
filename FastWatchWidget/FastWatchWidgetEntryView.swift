@@ -21,37 +21,23 @@ struct FastWatchWidgetEntryView: View {
     // MARK: - Corner (bar gauge like battery)
 
     var cornerView: some View {
-        ZStack {
-            if entry.isActive {
-                if entry.isGoalReached {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.yellow)
+        Image(systemName: entry.isActive
+              ? (entry.isGoalReached ? "checkmark" : "timer")
+              : "timer")
+            .font(.system(size: 24))
+            .foregroundStyle(entry.isActive ? ringColor : .gray)
+            .widgetCurvesContent()
+            .widgetLabel {
+                if entry.isActive {
+                    Gauge(value: min(entry.progress, 1.0)) {
+                        Text(entry.remainingText)
+                    }
+                    .gaugeStyle(.accessoryLinear)
+                    .tint(ringColor)
                 } else {
-                    Text(entry.remainingText)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-                        .minimumScaleFactor(0.5)
+                    Text("FastWatch")
                 }
-            } else {
-                Image(systemName: "timer")
-                    .font(.title3)
             }
-        }
-        .widgetCurvesContent()
-        .widgetLabel {
-            if entry.isActive {
-                Gauge(value: min(entry.progress, 1.0)) {
-                    Text("Fast")
-                } currentValueLabel: {
-                    Text(entry.remainingText)
-                }
-                .gaugeStyle(.accessoryLinear)
-                .tint(ringColor)
-            } else {
-                Text("FastWatch")
-            }
-        }
     }
 
     // MARK: - Rectangular (Smart Stack)

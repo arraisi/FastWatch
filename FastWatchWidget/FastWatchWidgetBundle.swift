@@ -12,6 +12,5 @@ import SwiftUI
 struct FastWatchWidgetBundle: WidgetBundle {
     var body: some Widget {
         FastWatchWidget()
-        FastWatchWidgetControl()
     }
 }
