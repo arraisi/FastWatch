@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 @Observable
 class FastingManager {
@@ -81,6 +82,8 @@ class FastingManager {
                 targetDuration: duration
             )
         }
+
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func endFast() {
@@ -101,6 +104,7 @@ class FastingManager {
         }
 
         notificationManager.cancelPendingNotifications()
+        WidgetCenter.shared.reloadAllTimelines()
 
         if case .goalReached(_, let protocolType) = state,
            let eatingDuration = protocolType.eatingDuration {

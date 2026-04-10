@@ -436,7 +436,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -470,7 +470,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -494,7 +494,7 @@
 				DEVELOPMENT_TEAM = 7UWQ7HF465;
 				INFOPLIST_KEY_CFBundleDisplayName = FastWatch;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -511,7 +511,7 @@
 				DEVELOPMENT_TEAM = 7UWQ7HF465;
 				INFOPLIST_KEY_CFBundleDisplayName = FastWatch;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -526,6 +526,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FastWatchWidget/FastWatchWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7UWQ7HF465;
@@ -540,7 +541,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp.FastWatchWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -559,6 +560,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FastWatchWidget/FastWatchWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7UWQ7HF465;
@@ -573,7 +575,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = group.com.fastwatch.shared.FastWatch.watchkitapp.FastWatchWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastwatch.FastWatch.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

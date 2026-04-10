@@ -92,32 +92,29 @@ struct FastWatchWidgetEntryView: View {
     // MARK: - Circular (fallback)
 
     var circularView: some View {
-        ZStack {
+        Group {
             if entry.isActive {
-                ZStack {
-                    Circle()
-                        .stroke(ringColor.opacity(0.3), lineWidth: 4)
-                    Circle()
-                        .trim(from: 0, to: min(entry.progress, 1.0))
-                        .stroke(ringColor, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
+                Gauge(value: min(entry.progress, 1.0)) {
+                    Image(systemName: "timer")
+                } currentValueLabel: {
                     if entry.isGoalReached {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(.yellow)
                     } else {
                         Text(entry.remainingText)
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                             .monospacedDigit()
-                            .minimumScaleFactor(0.6)
+                            .minimumScaleFactor(0.5)
                     }
                 }
-                .padding(2)
+                .gaugeStyle(.accessoryCircular)
+                .tint(ringColor)
             } else {
                 ZStack {
                     Circle()
                         .stroke(Color.gray.opacity(0.3), lineWidth: 4)
-                    Image(systemName: "play.fill")
+                    Image(systemName: "timer")
                         .font(.system(size: 12))
                         .foregroundStyle(.gray)
                 }
