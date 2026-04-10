@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import SwiftData
 
 @Observable
 class FastingManager {
@@ -12,7 +13,7 @@ class FastingManager {
 
     private(set) var state: FastState = .idle
     private(set) var activeFast: FastSession?
-    private(set) var history: [FastSession] = []
+    var modelContext: ModelContext?
 
     private let notificationManager = NotificationManager()
     private let defaults: UserDefaults
@@ -39,25 +40,31 @@ class FastingManager {
 
     // MARK: - Actions
 
-    func startFast(protocolType: FastingProtocol = .sixteen8) {
+    func startFast(protocolType: FastingProtocol? = nil) {
+        let proto = protocolType ?? preferences.defaultProtocol
         let now = Date()
-        let duration = protocolType.fastingDuration
+        let duration: TimeInterval
+        if proto == .custom {
+            duration = preferences.customFastingHours * 3600
+        } else {
+            duration = proto.fastingDuration
+        }
 
         let session = FastSession(
             id: UUID(),
             startTime: now,
             targetDuration: duration,
-            protocolType: protocolType,
+            protocolType: proto,
             isActive: true
         )
 
         activeFast = session
-        state = .fasting(startTime: now, protocolType: protocolType)
+        state = .fasting(startTime: now, protocolType: proto)
         persistActiveFast()
 
         notificationManager.scheduleGoalNotification(
             at: now.addingTimeInterval(duration),
-            protocolName: protocolType.displayName
+            protocolName: proto.displayName
         )
 
         if preferences.notifyOnMilestones {
@@ -73,7 +80,10 @@ class FastingManager {
         session.endTime = Date()
         session.isActive = false
 
-        history.insert(session, at: 0)
+        if let context = modelContext {
+            let completed = CompletedFast(from: session)
+            context.insert(completed)
+        }
 
         notificationManager.cancelPendingNotifications()
 
@@ -178,5 +188,66 @@ class FastingManager {
         default:
             return preferences.defaultProtocol.displayName
         }
+    }
+
+    // MARK: - History Stats
+
+    func fetchHistory() -> [CompletedFast] {
+        guard let context = modelContext else { return [] }
+        let descriptor = FetchDescriptor<CompletedFast>(
+            sortBy: [SortDescriptor(\.startTime, order: .reverse)]
+        )
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    func weeklyStats() -> (count: Int, totalHours: Double) {
+        guard let context = modelContext else { return (0, 0) }
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+        var descriptor = FetchDescriptor<CompletedFast>(
+            predicate: #Predicate { $0.startTime >= weekAgo }
+        )
+        descriptor.sortBy = [SortDescriptor(\.startTime)]
+        let fasts = (try? context.fetch(descriptor)) ?? []
+        let totalSeconds = fasts.reduce(0.0) { $0 + $1.actualDuration }
+        return (fasts.count, totalSeconds / 3600)
+    }
+
+    func currentStreak() -> Int {
+        let history = fetchHistory()
+        guard !history.isEmpty else { return 0 }
+
+        let calendar = Calendar.current
+        var streak = 0
+        var checkDate = calendar.startOfDay(for: Date())
+
+        while true {
+            let dayEnd = calendar.date(byAdding: .day, value: 1, to: checkDate)!
+            let hasfast = history.contains { fast in
+                fast.startTime >= checkDate && fast.startTime < dayEnd && fast.completedGoal
+            }
+            if hasfast {
+                streak += 1
+                guard let prevDay = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
+                checkDate = prevDay
+            } else if streak == 0 {
+                // today might not have a fast yet, check yesterday
+                guard let prevDay = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
+                checkDate = prevDay
+                let prevEnd = calendar.date(byAdding: .day, value: 1, to: checkDate)!
+                let hasPrevFast = history.contains { fast in
+                    fast.startTime >= checkDate && fast.startTime < prevEnd && fast.completedGoal
+                }
+                if hasPrevFast {
+                    streak += 1
+                    guard let prevPrev = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
+                    checkDate = prevPrev
+                } else {
+                    break
+                }
+            } else {
+                break
+            }
+        }
+        return streak
     }
 }

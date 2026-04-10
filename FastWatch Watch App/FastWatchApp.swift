@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct FastWatchApp: App {
@@ -9,5 +10,6 @@ struct FastWatchApp: App {
             HomeView()
                 .environment(fastingManager)
         }
+        .modelContainer(for: CompletedFast.self)
     }
 }

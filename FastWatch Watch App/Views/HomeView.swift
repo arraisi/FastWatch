@@ -1,12 +1,31 @@
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     @Environment(FastingManager.self) private var manager
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0)) { context in
-            let _ = manager.updateState()
-            content
+        NavigationStack {
+            TimelineView(.animation(minimumInterval: 1.0)) { context in
+                let _ = manager.updateState()
+                content
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape.fill")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: HistoryView()) {
+                        Image(systemName: "clock.arrow.circlepath")
+                    }
+                }
+            }
+        }
+        .onAppear {
+            manager.modelContext = modelContext
         }
     }
 
@@ -33,7 +52,7 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity)
             .aspectRatio(1, contentMode: .fill)
-            .padding(.horizontal, 30)
+            .padding(.horizontal, 35)
 
             Text(manager.currentProtocolLabel)
                 .font(.caption2)
@@ -77,9 +96,16 @@ struct HomeView: View {
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-            .environment(FastingManager())
-    }
+#Preview("Idle") {
+    HomeView()
+        .environment(FastingManager())
+        .modelContainer(for: CompletedFast.self, inMemory: true)
+}
+
+#Preview("Fasting") {
+    let manager = FastingManager()
+    manager.startFast(protocolType: .sixteen8)
+    return HomeView()
+        .environment(manager)
+        .modelContainer(for: CompletedFast.self, inMemory: true)
 }
