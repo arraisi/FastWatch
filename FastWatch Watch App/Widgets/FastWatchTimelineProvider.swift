@@ -5,8 +5,11 @@ struct FastWatchEntry: TimelineEntry {
     let date: Date
     let progress: Double
     let remainingText: String
+    let elapsedText: String
     let isActive: Bool
     let isGoalReached: Bool
+    let zoneName: String
+    let protocolName: String
 }
 
 struct FastWatchTimelineProvider: TimelineProvider {
@@ -17,8 +20,11 @@ struct FastWatchTimelineProvider: TimelineProvider {
             date: Date(),
             progress: 0.65,
             remainingText: "6h",
+            elapsedText: "10h",
             isActive: true,
-            isGoalReached: false
+            isGoalReached: false,
+            zoneName: "Fat Burning",
+            protocolName: "16:8"
         )
     }
 
@@ -32,8 +38,11 @@ struct FastWatchTimelineProvider: TimelineProvider {
                 date: Date(),
                 progress: 0,
                 remainingText: "",
+                elapsedText: "",
                 isActive: false,
-                isGoalReached: false
+                isGoalReached: false,
+                zoneName: "",
+                protocolName: ""
             )
             let timeline = Timeline(entries: [entry], policy: .never)
             completion(timeline)
@@ -43,20 +52,23 @@ struct FastWatchTimelineProvider: TimelineProvider {
         var entries: [FastWatchEntry] = []
         let now = Date()
 
-        // Generate entries every 15 minutes for the next 2 hours
         for minuteOffset in stride(from: 0, through: 120, by: 15) {
             let entryDate = now.addingTimeInterval(Double(minuteOffset * 60))
             let elapsed = entryDate.timeIntervalSince(session.startTime)
             let progress = session.targetDuration > 0 ? elapsed / session.targetDuration : 0
             let remaining = max(0, session.targetDuration - elapsed)
             let goalReached = elapsed >= session.targetDuration
+            let zone = FastingZone.zone(for: elapsed / 3600)
 
             entries.append(FastWatchEntry(
                 date: entryDate,
                 progress: progress,
                 remainingText: remaining.shortFormatted,
+                elapsedText: elapsed.shortFormatted,
                 isActive: true,
-                isGoalReached: goalReached
+                isGoalReached: goalReached,
+                zoneName: zone.rawValue,
+                protocolName: session.protocolType.displayName
             ))
         }
 
@@ -71,21 +83,28 @@ struct FastWatchTimelineProvider: TimelineProvider {
                 date: Date(),
                 progress: 0,
                 remainingText: "",
+                elapsedText: "",
                 isActive: false,
-                isGoalReached: false
+                isGoalReached: false,
+                zoneName: "",
+                protocolName: ""
             )
         }
 
         let elapsed = Date().timeIntervalSince(session.startTime)
         let progress = session.targetDuration > 0 ? elapsed / session.targetDuration : 0
         let remaining = max(0, session.targetDuration - elapsed)
+        let zone = FastingZone.zone(for: elapsed / 3600)
 
         return FastWatchEntry(
             date: Date(),
             progress: progress,
             remainingText: remaining.shortFormatted,
+            elapsedText: elapsed.shortFormatted,
             isActive: true,
-            isGoalReached: elapsed >= session.targetDuration
+            isGoalReached: elapsed >= session.targetDuration,
+            zoneName: zone.rawValue,
+            protocolName: session.protocolType.displayName
         )
     }
 

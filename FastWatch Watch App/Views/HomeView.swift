@@ -31,25 +31,33 @@ struct HomeView: View {
 
     private var content: some View {
         VStack(spacing: 4) {
-            ZStack {
-                ProgressRingView(
-                    progress: manager.currentProgress,
-                    color: manager.ringColor,
-                    lineWidth: 10
-                )
+            NavigationLink(destination: ActiveFastDetailView()) {
+                ZStack {
+                    ProgressRingView(
+                        progress: manager.currentProgress,
+                        color: manager.ringColor,
+                        lineWidth: 10
+                    )
 
-                VStack(spacing: 2) {
-                    Text(manager.elapsedTime.formattedHHMM)
-                        .font(.system(.title2, design: .rounded, weight: .bold))
-                        .monospacedDigit()
+                    VStack(spacing: 2) {
+                        Text(manager.elapsedTime.formattedHHMM)
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .monospacedDigit()
 
-                    if manager.isActive {
-                        Text("-\(manager.remainingTime.formattedHoursMinutes)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        if manager.isActive {
+                            Text("-\(manager.remainingTime.formattedHoursMinutes)")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+
+                            Text(manager.currentZone.rawValue)
+                                .font(.system(size: 9))
+                                .foregroundStyle(manager.currentZone.color)
+                        }
                     }
                 }
             }
+            .buttonStyle(.plain)
+            .disabled(!manager.isActive)
             .frame(maxWidth: .infinity)
             .aspectRatio(1, contentMode: .fill)
             .padding(.horizontal, 35)

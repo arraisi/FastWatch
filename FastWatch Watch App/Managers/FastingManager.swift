@@ -16,6 +16,7 @@ class FastingManager {
     var modelContext: ModelContext?
 
     private let notificationManager = NotificationManager()
+    let healthKitManager = HealthKitManager()
     private let defaults: UserDefaults
     private static let activeFastKey = "activeFast"
 
@@ -73,6 +74,13 @@ class FastingManager {
                 duration: duration
             )
         }
+
+        if preferences.overtimeReminder {
+            notificationManager.scheduleOvertimeReminder(
+                startTime: now,
+                targetDuration: duration
+            )
+        }
     }
 
     func endFast() {
@@ -83,6 +91,13 @@ class FastingManager {
         if let context = modelContext {
             let completed = CompletedFast(from: session)
             context.insert(completed)
+        }
+
+        if preferences.healthKitEnabled {
+            healthKitManager.saveFast(
+                startTime: session.startTime,
+                endTime: session.endTime ?? Date()
+            ) { _ in }
         }
 
         notificationManager.cancelPendingNotifications()
@@ -188,6 +203,11 @@ class FastingManager {
         default:
             return preferences.defaultProtocol.displayName
         }
+    }
+
+    var currentZone: FastingZone {
+        guard let fast = activeFast else { return .fed }
+        return FastingZone.zone(for: fast.elapsed / 3600)
     }
 
     // MARK: - History Stats

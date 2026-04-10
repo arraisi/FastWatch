@@ -11,6 +11,7 @@ struct UserPreferences: Codable {
     var hapticsEnabled: Bool = true
     var hapticIntensity: HapticIntensity = .strong
     var overtimeReminder: Bool = true
+    var healthKitEnabled: Bool = false
 }
 
 enum HapticIntensity: String, Codable {

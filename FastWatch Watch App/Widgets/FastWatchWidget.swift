@@ -10,6 +10,6 @@ struct FastWatchWidget: Widget {
         }
         .configurationDisplayName("FastWatch")
         .description("Track your fasting progress.")
-        .supportedFamilies([.accessoryCorner, .accessoryCircular])
+        .supportedFamilies([.accessoryCorner, .accessoryCircular, .accessoryRectangular])
     }
 }

@@ -9,6 +9,9 @@ struct FastWatchWidgetEntryView: View {
         switch family {
         case .accessoryCorner:
             cornerView
+        case .accessoryRectangular:
+            rectangularView
+                .containerBackground(.clear, for: .widget)
         default:
             circularView
                 .containerBackground(.clear, for: .widget)
@@ -47,6 +50,55 @@ struct FastWatchWidgetEntryView: View {
                 .tint(ringColor)
             } else {
                 Text("FastWatch")
+            }
+        }
+    }
+
+    // MARK: - Rectangular (Smart Stack)
+
+    var rectangularView: some View {
+        Group {
+            if entry.isActive {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: entry.isGoalReached ? "checkmark.circle.fill" : "timer")
+                            .foregroundStyle(ringColor)
+                        Text(entry.protocolName)
+                            .font(.headline)
+                        Spacer()
+                        Text(entry.isGoalReached ? "Done!" : entry.remainingText)
+                            .font(.system(.body, design: .rounded, weight: .bold))
+                            .monospacedDigit()
+                    }
+
+                    Gauge(value: min(entry.progress, 1.0)) {
+                        EmptyView()
+                    }
+                    .gaugeStyle(.accessoryLinear)
+                    .tint(ringColor)
+
+                    HStack {
+                        Text(entry.zoneName)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(entry.elapsedText + " elapsed")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: "timer")
+                            .foregroundStyle(.secondary)
+                        Text("FastWatch")
+                            .font(.headline)
+                    }
+                    Text("No active fast")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -96,12 +148,43 @@ struct FastWatchWidgetEntryView: View {
     }
 }
 
-// Previews (corner gauge rendered as standalone since widget context not available)
+// MARK: - Previews
+
+private let previewActiveEntry = FastWatchEntry(
+    date: Date(), progress: 0.65, remainingText: "6h", elapsedText: "10h",
+    isActive: true, isGoalReached: false, zoneName: "Fat Burning", protocolName: "16:8"
+)
+
+private let previewGoalEntry = FastWatchEntry(
+    date: Date(), progress: 1.0, remainingText: "0m", elapsedText: "16h",
+    isActive: true, isGoalReached: true, zoneName: "Ketosis", protocolName: "16:8"
+)
+
+private let previewIdleEntry = FastWatchEntry(
+    date: Date(), progress: 0, remainingText: "", elapsedText: "",
+    isActive: false, isGoalReached: false, zoneName: "", protocolName: ""
+)
+
+#Preview("Rectangular Active") {
+    FastWatchWidgetEntryView(entry: previewActiveEntry).rectangularView
+        .frame(width: 180, height: 70)
+        .padding()
+}
+
+#Preview("Rectangular Goal") {
+    FastWatchWidgetEntryView(entry: previewGoalEntry).rectangularView
+        .frame(width: 180, height: 70)
+        .padding()
+}
+
+#Preview("Rectangular Idle") {
+    FastWatchWidgetEntryView(entry: previewIdleEntry).rectangularView
+        .frame(width: 180, height: 70)
+        .padding()
+}
+
 #Preview("Corner Active") {
-    let entry = FastWatchEntry(
-        date: Date(), progress: 0.65, remainingText: "6h",
-        isActive: true, isGoalReached: false
-    )
+    let entry = previewActiveEntry
     VStack(spacing: 12) {
         Gauge(value: min(entry.progress, 1.0)) {
             Image(systemName: "timer")
@@ -110,7 +193,6 @@ struct FastWatchWidgetEntryView: View {
         }
         .gaugeStyle(.accessoryLinear)
         .tint(.teal)
-
         Text("Corner complication preview")
             .font(.caption2)
             .foregroundStyle(.secondary)
@@ -119,34 +201,12 @@ struct FastWatchWidgetEntryView: View {
     .padding()
 }
 
-#Preview("Corner Goal Reached") {
-    VStack(spacing: 12) {
-        Gauge(value: 1.0) {
-            Image(systemName: "checkmark.circle.fill")
-        }
-        .gaugeStyle(.accessoryLinear)
-        .tint(.yellow)
-
-        Text("Goal reached")
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-    }
-    .frame(width: 160)
-    .padding()
-}
-
 #Preview("Circular Active") {
-    FastWatchWidgetEntryView(entry: FastWatchEntry(
-        date: Date(), progress: 0.65, remainingText: "6h",
-        isActive: true, isGoalReached: false
-    )).circularView
-    .frame(width: 76, height: 76)
+    FastWatchWidgetEntryView(entry: previewActiveEntry).circularView
+        .frame(width: 76, height: 76)
 }
 
 #Preview("Circular Idle") {
-    FastWatchWidgetEntryView(entry: FastWatchEntry(
-        date: Date(), progress: 0, remainingText: "",
-        isActive: false, isGoalReached: false
-    )).circularView
-    .frame(width: 76, height: 76)
+    FastWatchWidgetEntryView(entry: previewIdleEntry).circularView
+        .frame(width: 76, height: 76)
 }

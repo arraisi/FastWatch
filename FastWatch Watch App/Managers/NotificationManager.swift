@@ -86,6 +86,32 @@ class NotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
 
+    func scheduleOvertimeReminder(startTime: Date, targetDuration: TimeInterval) {
+        let overtimeDate = startTime.addingTimeInterval(targetDuration * 2)
+        let interval = overtimeDate.timeIntervalSinceNow
+        guard interval > 0 else { return }
+
+        let hours = Int(targetDuration * 2) / 3600
+
+        let content = UNMutableNotificationContent()
+        content.title = "Still fasting?"
+        content.body = "\(hours)h and counting. Tap to check in."
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: interval,
+            repeats: false
+        )
+
+        let request = UNNotificationRequest(
+            identifier: "overtime-reminder",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
     func cancelPendingNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }

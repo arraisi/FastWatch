@@ -59,6 +59,28 @@ struct SettingsView: View {
                     set: { manager.preferences.overtimeReminder = $0 }
                 ))
             }
+
+            if manager.healthKitManager.isAvailable {
+                Section("Health") {
+                    Toggle("Save to Health", isOn: Binding(
+                        get: { manager.preferences.healthKitEnabled },
+                        set: { newValue in
+                            if newValue {
+                                manager.healthKitManager.requestAuthorization { granted in
+                                    manager.preferences.healthKitEnabled = granted
+                                }
+                            } else {
+                                manager.preferences.healthKitEnabled = false
+                            }
+                        }
+                    ))
+                    if manager.preferences.healthKitEnabled {
+                        Text("Fasts saved as Mindful Sessions")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
         .navigationTitle("Settings")
     }
