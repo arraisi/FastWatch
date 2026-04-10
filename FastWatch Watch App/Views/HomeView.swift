@@ -32,7 +32,8 @@ struct HomeView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1, contentMode: .fill)
+            .padding(.horizontal, 30)
 
             Text(manager.currentProtocolLabel)
                 .font(.caption2)
@@ -41,6 +42,7 @@ struct HomeView: View {
             actionButton
         }
         .padding(.horizontal, 4)
+        .padding(.bottom,25)
     }
 
     @ViewBuilder
