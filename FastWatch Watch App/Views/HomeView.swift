@@ -49,9 +49,15 @@ struct HomeView: View {
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
 
-                            Text(manager.currentZone.rawValue)
-                                .font(.system(size: 9))
-                                .foregroundStyle(manager.currentZone.color)
+                            if case .eating = manager.state {
+                                Text("Eating")
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(.orange)
+                            } else {
+                                Text(manager.currentZone.rawValue)
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(manager.currentZone.color)
+                            }
                         }
                     }
                 }
@@ -89,17 +95,12 @@ struct HomeView: View {
             }
             .tint(.red)
 
-        case .eating(let until, _):
-            VStack(spacing: 2) {
-                Text("Eating until \(until, style: .time)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                Button(action: { manager.startFast() }) {
-                    Label("Start Fast", systemImage: "play.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .tint(.green)
+        case .eating:
+            Button(action: { manager.startFast() }) {
+                Label("Start Fast", systemImage: "play.fill")
+                    .frame(maxWidth: .infinity)
             }
+            .tint(.green)
         }
     }
 }

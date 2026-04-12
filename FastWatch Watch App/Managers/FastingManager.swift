@@ -8,7 +8,7 @@ class FastingManager {
     enum FastState: Equatable {
         case idle
         case fasting(startTime: Date, protocolType: FastingProtocol)
-        case eating(until: Date, protocolType: FastingProtocol)
+        case eating(startTime: Date, until: Date, protocolType: FastingProtocol)
     }
 
     private(set) var state: FastState = .idle
@@ -114,8 +114,9 @@ class FastingManager {
 
         let eatingDuration = proto.eatingDuration ?? (proto.fastingDuration > 0 ? 6 * 3600 : 0)
         if eatingDuration > 0 {
-            let eatingEnd = Date().addingTimeInterval(eatingDuration)
-            state = .eating(until: eatingEnd, protocolType: proto)
+            let now = Date()
+            let eatingEnd = now.addingTimeInterval(eatingDuration)
+            state = .eating(startTime: now, until: eatingEnd, protocolType: proto)
 
             if preferences.notifyEatingWindowEnding {
                 let reminderMinutes = preferences.eatingWindowReminderMinutes
@@ -139,7 +140,7 @@ class FastingManager {
                 }
                 completeFast()
             }
-        case .eating(let until, let protocolType):
+        case .eating(_, let until, let protocolType):
             if Date() >= until {
                 startFast(protocolType: protocolType)
             }
@@ -179,18 +180,37 @@ class FastingManager {
     }
 
     var currentProgress: Double {
-        activeFast?.progress ?? 0
+        switch state {
+        case .eating(let start, let until, _):
+            let total = until.timeIntervalSince(start)
+            guard total > 0 else { return 0 }
+            let elapsed = Date().timeIntervalSince(start)
+            return min(elapsed / total, 1.0)
+        default:
+            return activeFast?.progress ?? 0
+        }
     }
 
     var elapsedTime: TimeInterval {
-        activeFast?.elapsed ?? 0
+        switch state {
+        case .eating(let start, _, _):
+            return Date().timeIntervalSince(start)
+        default:
+            return activeFast?.elapsed ?? 0
+        }
     }
 
     var remainingTime: TimeInterval {
-        activeFast?.remaining ?? 0
+        switch state {
+        case .eating(_, let until, _):
+            return max(0, until.timeIntervalSince(Date()))
+        default:
+            return activeFast?.remaining ?? 0
+        }
     }
 
     var ringColor: Color {
+        if case .eating = state { return .orange }
         let p = currentProgress
         if p >= 1.0 { return .yellow }
         if p >= 0.75 { return .blue }
@@ -200,7 +220,7 @@ class FastingManager {
 
     var currentProtocolLabel: String {
         switch state {
-        case .fasting(_, let p), .eating(_, let p):
+        case .fasting(_, let p), .eating(_, _, let p):
             return p.displayName
         default:
             return preferences.defaultProtocol.displayName
