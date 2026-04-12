@@ -8,8 +8,7 @@ class FastingManager {
     enum FastState: Equatable {
         case idle
         case fasting(startTime: Date, protocolType: FastingProtocol)
-        case goalReached(startTime: Date, protocolType: FastingProtocol)
-        case eating(until: Date)
+        case eating(until: Date, protocolType: FastingProtocol)
     }
 
     private(set) var state: FastState = .idle
@@ -87,7 +86,13 @@ class FastingManager {
     }
 
     func endFast() {
+        guard let _ = activeFast else { return }
+        completeFast()
+    }
+
+    private func completeFast() {
         guard var session = activeFast else { return }
+        let proto = session.protocolType
         session.endTime = Date()
         session.isActive = false
 
@@ -104,14 +109,13 @@ class FastingManager {
         }
 
         notificationManager.cancelPendingNotifications()
-        WidgetCenter.shared.reloadAllTimelines()
+        activeFast = nil
+        clearPersistedFast()
 
-        if case .goalReached(_, let protocolType) = state,
-           let eatingDuration = protocolType.eatingDuration {
+        let eatingDuration = proto.eatingDuration ?? (proto.fastingDuration > 0 ? 6 * 3600 : 0)
+        if eatingDuration > 0 {
             let eatingEnd = Date().addingTimeInterval(eatingDuration)
-            state = .eating(until: eatingEnd)
-            activeFast = nil
-            clearPersistedFast()
+            state = .eating(until: eatingEnd, protocolType: proto)
 
             if preferences.notifyEatingWindowEnding {
                 let reminderMinutes = preferences.eatingWindowReminderMinutes
@@ -120,25 +124,24 @@ class FastingManager {
             }
         } else {
             state = .idle
-            activeFast = nil
-            clearPersistedFast()
         }
+
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func updateState() {
-        guard let fast = activeFast else { return }
-
         switch state {
-        case .fasting(let startTime, let protocolType):
+        case .fasting:
+            guard let fast = activeFast else { return }
             if fast.elapsed >= fast.targetDuration {
-                state = .goalReached(startTime: startTime, protocolType: protocolType)
                 if preferences.hapticsEnabled {
                     notificationManager.playSuccessHaptic()
                 }
+                completeFast()
             }
-        case .eating(let until):
+        case .eating(let until, let protocolType):
             if Date() >= until {
-                state = .idle
+                startFast(protocolType: protocolType)
             }
         default:
             break
@@ -165,12 +168,7 @@ class FastingManager {
         else { return }
 
         activeFast = session
-
-        if session.elapsed >= session.targetDuration {
-            state = .goalReached(startTime: session.startTime, protocolType: session.protocolType)
-        } else {
-            state = .fasting(startTime: session.startTime, protocolType: session.protocolType)
-        }
+        state = .fasting(startTime: session.startTime, protocolType: session.protocolType)
     }
 
     // MARK: - Computed Helpers
@@ -202,7 +200,7 @@ class FastingManager {
 
     var currentProtocolLabel: String {
         switch state {
-        case .fasting(_, let p), .goalReached(_, let p):
+        case .fasting(_, let p), .eating(_, let p):
             return p.displayName
         default:
             return preferences.defaultProtocol.displayName

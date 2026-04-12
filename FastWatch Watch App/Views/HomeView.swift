@@ -82,14 +82,14 @@ struct HomeView: View {
             }
             .tint(.green)
 
-        case .fasting, .goalReached:
+        case .fasting:
             Button(action: { manager.endFast() }) {
                 Label("End Fast", systemImage: "stop.fill")
                     .frame(maxWidth: .infinity)
             }
             .tint(.red)
 
-        case .eating(let until):
+        case .eating(let until, _):
             VStack(spacing: 2) {
                 Text("Eating until \(until, style: .time)")
                     .font(.caption2)
