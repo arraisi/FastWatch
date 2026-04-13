@@ -19,10 +19,14 @@ class FastingManager {
     let healthKitManager = HealthKitManager()
     private let defaults: UserDefaults
     private static let activeFastKey = "activeFast"
+    private static let eatingSessionKey = "eatingSession"
 
     init() {
         defaults = UserDefaults(suiteName: "group.com.fastwatch.shared") ?? .standard
         restoreActiveFast()
+        if case .idle = state {
+            restoreEatingState()
+        }
     }
 
     var preferences: UserPreferences {
@@ -42,6 +46,9 @@ class FastingManager {
     // MARK: - Actions
 
     func startFast(protocolType: FastingProtocol? = nil) {
+        clearPersistedEatingState()
+        notificationManager.cancelEatingNotifications()
+
         let proto = protocolType ?? preferences.defaultProtocol
         let now = Date()
         let duration: TimeInterval
@@ -108,7 +115,8 @@ class FastingManager {
             ) { _ in }
         }
 
-        notificationManager.cancelPendingNotifications()
+        notificationManager.cancelFastingNotifications()
+        notificationManager.removeDeliveredFastingNotifications()
         activeFast = nil
         clearPersistedFast()
 
@@ -117,6 +125,7 @@ class FastingManager {
             let now = Date()
             let eatingEnd = now.addingTimeInterval(eatingDuration)
             state = .eating(startTime: now, until: eatingEnd, protocolType: proto)
+            persistEatingState(startTime: now, endTime: eatingEnd, protocolType: proto)
 
             if preferences.notifyEatingWindowEnding {
                 let reminderMinutes = preferences.eatingWindowReminderMinutes
@@ -168,8 +177,80 @@ class FastingManager {
               session.isActive
         else { return }
 
+        // Cancel any leftover eating notifications from previous session
+        notificationManager.cancelEatingNotifications()
+        notificationManager.removeDeliveredEatingNotifications()
+
         activeFast = session
         state = .fasting(startTime: session.startTime, protocolType: session.protocolType)
+
+        // Re-schedule notifications for remaining milestones
+        rescheduleNotificationsForRestoredFast(session)
+    }
+
+    private func rescheduleNotificationsForRestoredFast(_ session: FastSession) {
+        let goalDate = session.startTime.addingTimeInterval(session.targetDuration)
+
+        // Re-schedule goal notification if not yet reached
+        if goalDate > Date() {
+            notificationManager.scheduleGoalNotification(
+                at: goalDate,
+                protocolName: session.protocolType.displayName
+            )
+        }
+
+        // Re-schedule remaining milestones
+        if preferences.notifyOnMilestones {
+            notificationManager.scheduleMilestoneNotifications(
+                startTime: session.startTime,
+                duration: session.targetDuration
+            )
+        }
+
+        // Re-schedule overtime reminder
+        if preferences.overtimeReminder {
+            notificationManager.scheduleOvertimeReminder(
+                startTime: session.startTime,
+                targetDuration: session.targetDuration
+            )
+        }
+    }
+
+    // MARK: - Eating State Persistence
+
+    private func persistEatingState(startTime: Date, endTime: Date, protocolType: FastingProtocol) {
+        let session = EatingSession(startTime: startTime, endTime: endTime, protocolType: protocolType)
+        guard let data = try? JSONEncoder().encode(session) else { return }
+        defaults.set(data, forKey: Self.eatingSessionKey)
+    }
+
+    private func clearPersistedEatingState() {
+        defaults.removeObject(forKey: Self.eatingSessionKey)
+    }
+
+    private func restoreEatingState() {
+        guard let data = defaults.data(forKey: Self.eatingSessionKey),
+              let session = try? JSONDecoder().decode(EatingSession.self, from: data),
+              !session.isExpired
+        else {
+            clearPersistedEatingState()
+            return
+        }
+
+        // Cancel any leftover fasting notifications from previous session
+        notificationManager.cancelFastingNotifications()
+        notificationManager.removeDeliveredFastingNotifications()
+
+        state = .eating(startTime: session.startTime, until: session.endTime, protocolType: session.protocolType)
+
+        // Re-schedule eating window reminder if needed
+        if preferences.notifyEatingWindowEnding {
+            let reminderMinutes = preferences.eatingWindowReminderMinutes
+            let reminderTime = session.endTime.addingTimeInterval(-Double(reminderMinutes * 60))
+            if reminderTime > Date() {
+                notificationManager.scheduleEatingWindowReminder(at: reminderTime, minutesLeft: reminderMinutes)
+            }
+        }
     }
 
     // MARK: - Computed Helpers

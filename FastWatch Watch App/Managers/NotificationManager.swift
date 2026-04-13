@@ -3,6 +3,20 @@ import UserNotifications
 import WatchKit
 
 class NotificationManager {
+    // MARK: - Notification Identifiers
+
+    private static let fastingIdentifiers = [
+        "fasting-goal-reached",
+        "fasting-milestone-25",
+        "fasting-milestone-50",
+        "fasting-milestone-75",
+        "fasting-overtime-reminder"
+    ]
+
+    private static let eatingIdentifiers = [
+        "eating-window-ending"
+    ]
+
     func requestPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
@@ -21,7 +35,7 @@ class NotificationManager {
         )
 
         let request = UNNotificationRequest(
-            identifier: "goal-reached",
+            identifier: "fasting-goal-reached",
             content: content,
             trigger: trigger
         )
@@ -54,7 +68,7 @@ class NotificationManager {
             )
 
             let request = UNNotificationRequest(
-                identifier: "milestone-\(Int(fraction * 100))",
+                identifier: "fasting-milestone-\(Int(fraction * 100))",
                 content: content,
                 trigger: trigger
             )
@@ -104,7 +118,7 @@ class NotificationManager {
         )
 
         let request = UNNotificationRequest(
-            identifier: "overtime-reminder",
+            identifier: "fasting-overtime-reminder",
             content: content,
             trigger: trigger
         )
@@ -114,6 +128,34 @@ class NotificationManager {
 
     func cancelPendingNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+
+    // MARK: - Category-Specific Cancellation
+
+    func cancelFastingNotifications() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: Self.fastingIdentifiers
+        )
+    }
+
+    func cancelEatingNotifications() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: Self.eatingIdentifiers
+        )
+    }
+
+    // MARK: - Delivered Notification Cleanup
+
+    func removeDeliveredFastingNotifications() {
+        UNUserNotificationCenter.current().removeDeliveredNotifications(
+            withIdentifiers: Self.fastingIdentifiers
+        )
+    }
+
+    func removeDeliveredEatingNotifications() {
+        UNUserNotificationCenter.current().removeDeliveredNotifications(
+            withIdentifiers: Self.eatingIdentifiers
+        )
     }
 
     func playSuccessHaptic() {
