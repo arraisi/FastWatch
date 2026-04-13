@@ -44,48 +44,89 @@ struct FastWatchWidgetEntryView: View {
 
     var rectangularView: some View {
         Group {
-            if entry.isActive {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Image(systemName: entry.isGoalReached ? "checkmark.circle.fill" : "timer")
-                            .foregroundStyle(ringColor)
-                        Text(entry.protocolName)
-                            .font(.headline)
-                        Spacer()
-                        Text(entry.isGoalReached ? "Done!" : entry.remainingText)
-                            .font(.system(.body, design: .rounded, weight: .bold))
-                            .monospacedDigit()
-                    }
-
-                    Gauge(value: min(entry.progress, 1.0)) {
-                        EmptyView()
-                    }
-                    .gaugeStyle(.accessoryLinear)
-                    .tint(ringColor)
-
-                    HStack {
-                        Text(entry.zoneName)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(entry.elapsedText + " elapsed")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+            if entry.isEating {
+                eatingRectangularView
+            } else if entry.isActive {
+                fastingRectangularView
             } else {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Image(systemName: "timer")
-                            .foregroundStyle(.secondary)
-                        Text("FastWatch")
-                            .font(.headline)
-                    }
-                    Text("No active fast")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                idleRectangularView
             }
+        }
+    }
+
+    private var fastingRectangularView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: entry.isGoalReached ? "checkmark.circle.fill" : "timer")
+                    .foregroundStyle(ringColor)
+                Text(entry.protocolName)
+                    .font(.headline)
+                Spacer()
+                Text(entry.isGoalReached ? "Done!" : entry.remainingText)
+                    .font(.system(.body, design: .rounded, weight: .bold))
+                    .monospacedDigit()
+            }
+
+            Gauge(value: min(entry.progress, 1.0)) {
+                EmptyView()
+            }
+            .gaugeStyle(.accessoryLinear)
+            .tint(ringColor)
+
+            HStack {
+                Text(entry.zoneName)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(entry.elapsedText + " elapsed")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var eatingRectangularView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: "fork.knife")
+                    .foregroundStyle(.orange)
+                Text("Eating")
+                    .font(.headline)
+                Spacer()
+                Text(entry.eatingRemainingText)
+                    .font(.system(.body, design: .rounded, weight: .bold))
+                    .monospacedDigit()
+            }
+
+            Gauge(value: min(entry.eatingProgress, 1.0)) {
+                EmptyView()
+            }
+            .gaugeStyle(.accessoryLinear)
+            .tint(.orange)
+
+            HStack {
+                Text(entry.protocolName)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("until next fast")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var idleRectangularView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: "timer")
+                    .foregroundStyle(.secondary)
+                Text("FastWatch")
+                    .font(.headline)
+            }
+            Text("No active fast")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -135,17 +176,26 @@ struct FastWatchWidgetEntryView: View {
 
 private let previewActiveEntry = FastWatchEntry(
     date: Date(), progress: 0.65, remainingText: "6h", elapsedText: "10h",
-    isActive: true, isGoalReached: false, zoneName: "Fat Burning", protocolName: "16:8"
+    isActive: true, isGoalReached: false, zoneName: "Fat Burning", protocolName: "16:8",
+    isEating: false, eatingRemainingText: "", eatingProgress: 0
 )
 
 private let previewGoalEntry = FastWatchEntry(
     date: Date(), progress: 1.0, remainingText: "0m", elapsedText: "16h",
-    isActive: true, isGoalReached: true, zoneName: "Ketosis", protocolName: "16:8"
+    isActive: true, isGoalReached: true, zoneName: "Ketosis", protocolName: "16:8",
+    isEating: false, eatingRemainingText: "", eatingProgress: 0
 )
 
 private let previewIdleEntry = FastWatchEntry(
     date: Date(), progress: 0, remainingText: "", elapsedText: "",
-    isActive: false, isGoalReached: false, zoneName: "", protocolName: ""
+    isActive: false, isGoalReached: false, zoneName: "", protocolName: "",
+    isEating: false, eatingRemainingText: "", eatingProgress: 0
+)
+
+private let previewEatingEntry = FastWatchEntry(
+    date: Date(), progress: 0, remainingText: "", elapsedText: "",
+    isActive: false, isGoalReached: false, zoneName: "", protocolName: "16:8",
+    isEating: true, eatingRemainingText: "6h 30m", eatingProgress: 0.2
 )
 
 #Preview("Rectangular Active") {
@@ -162,6 +212,12 @@ private let previewIdleEntry = FastWatchEntry(
 
 #Preview("Rectangular Idle") {
     FastWatchWidgetEntryView(entry: previewIdleEntry).rectangularView
+        .frame(width: 180, height: 70)
+        .padding()
+}
+
+#Preview("Rectangular Eating") {
+    FastWatchWidgetEntryView(entry: previewEatingEntry).rectangularView
         .frame(width: 180, height: 70)
         .padding()
 }
