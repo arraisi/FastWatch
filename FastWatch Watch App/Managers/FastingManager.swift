@@ -315,6 +315,16 @@ class FastingManager {
 
     // MARK: - History Stats
 
+    func clearHistory() {
+        guard let context = modelContext else { return }
+        do {
+            try context.delete(model: CompletedFast.self)
+            WidgetCenter.shared.reloadAllTimelines()
+        } catch {
+            print("Failed to clear history: \(error)")
+        }
+    }
+
     func fetchHistory() -> [CompletedFast] {
         guard let context = modelContext else { return [] }
         let descriptor = FetchDescriptor<CompletedFast>(

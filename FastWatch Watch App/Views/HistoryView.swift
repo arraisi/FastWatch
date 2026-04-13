@@ -4,6 +4,7 @@ import SwiftData
 struct HistoryView: View {
     @Environment(FastingManager.self) private var manager
     @Query(sort: \CompletedFast.startTime, order: .reverse) private var fasts: [CompletedFast]
+    @State private var showingClearConfirmation = false
 
     var body: some View {
         List {
@@ -17,6 +18,7 @@ struct HistoryView: View {
                     systemImage: "clock",
                     description: Text("Complete a fast to see it here.")
                 )
+                .frame(maxWidth: .infinity, alignment: .center)
             } else {
                 ForEach(fasts) { fast in
                     NavigationLink(destination: FastDetailView(fast: fast)) {
@@ -26,6 +28,24 @@ struct HistoryView: View {
             }
         }
         .navigationTitle("History")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingClearConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .disabled(fasts.isEmpty)
+            }
+        }
+        .alert("Clear History", isPresented: $showingClearConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Clear All", role: .destructive) {
+                manager.clearHistory()
+            }
+        } message: {
+            Text("This will permanently delete all your fasting history. This action cannot be undone.")
+        }
     }
 
     private var weeklySummary: some View {
