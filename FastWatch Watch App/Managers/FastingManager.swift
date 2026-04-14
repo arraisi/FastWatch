@@ -58,6 +58,8 @@ class FastingManager {
             duration = proto.fastingDuration
         }
 
+        guard duration >= 3600 else { return } // Minimum 1 hour
+
         let session = FastSession(
             id: UUID(),
             startTime: now,

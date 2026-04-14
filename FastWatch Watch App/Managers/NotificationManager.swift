@@ -29,8 +29,11 @@ class NotificationManager {
         content.body = "You did it! \(protocolName) fast complete!"
         content.sound = .default
 
+        let interval = date.timeIntervalSinceNow
+        guard interval > 0 else { return }
+
         let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: max(1, date.timeIntervalSinceNow),
+            timeInterval: interval,
             repeats: false
         )
 
