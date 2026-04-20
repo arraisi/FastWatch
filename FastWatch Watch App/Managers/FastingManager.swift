@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 import WidgetKit
+import WatchKit  // T017: For background refresh scheduling
 
 @Observable
 class FastingManager {
@@ -134,6 +135,9 @@ class FastingManager {
                 let reminderTime = eatingEnd.addingTimeInterval(-Double(reminderMinutes * 60))
                 notificationManager.scheduleEatingWindowReminder(at: reminderTime, minutesLeft: reminderMinutes)
             }
+
+            // T016, T018: Schedule background refresh at eating end for widget sync
+            scheduleBackgroundRefreshAtEatingEnd(eatingEnd, protocolType: proto)
         } else {
             state = .idle
         }
@@ -215,6 +219,21 @@ class FastingManager {
                 startTime: session.startTime,
                 targetDuration: session.targetDuration
             )
+        }
+    }
+
+    // MARK: - Background Refresh (T016, T018)
+
+    /// Schedules a background refresh at eating end time to ensure widget sync.
+    /// This is a backup mechanism - the widget timeline handles most cases.
+    private func scheduleBackgroundRefreshAtEatingEnd(_ eatingEnd: Date, protocolType: FastingProtocol) {
+        WKApplication.shared().scheduleBackgroundRefresh(
+            withPreferredDate: eatingEnd,
+            userInfo: ["action": "eatingEnded", "protocolType": protocolType.rawValue] as NSDictionary
+        ) { error in
+            if let error = error {
+                print("[FastingManager] Background refresh scheduling failed: \(error.localizedDescription)")
+            }
         }
     }
 
